@@ -1,0 +1,9 @@
+# Requirements for Smart Theft Detection System
+# Tech Stack: YOLOv11 (Ultralytics), OpenCV, NumPy, Supervision, ByteTrack
+
+opencv-python>=4.8.0
+numpy>=1.24.0
+ultralytics>=8.0.0
+supervision>=0.17.0
+# Note: SQLite3 is included in the Python 3.12 standard library.
+# ByteTrack can be utilized directly through Supervision or installed separately if needed.
