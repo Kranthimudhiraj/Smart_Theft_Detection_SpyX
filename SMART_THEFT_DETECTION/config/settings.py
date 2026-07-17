@@ -20,3 +20,7 @@ ALLOWED_CLASSES = [
     "chair", "laptop", "mouse", "keyboard", "remote", "tv",
     "box"
 ]
+
+# Express Server Configuration for Telemetry
+EXPRESS_SERVER_URL = "http://localhost:3001"
+
