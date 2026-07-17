@@ -11,7 +11,11 @@ class VideoStream:
         """
         Initializes the video stream and starts the background thread.
         """
-        self.stream = cv2.VideoCapture(src)
+        self.stream = cv2.VideoCapture(src, cv2.CAP_V4L2)
+        self.stream.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
+        self.stream.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+        self.stream.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+        self.stream.set(cv2.CAP_PROP_FPS, 30)
         if not self.stream.isOpened():
             raise ValueError(f"Failed to open video source: {src}")
             
@@ -62,4 +66,4 @@ class VideoStream:
         return self.stream.get(prop_id)
         
     def isOpened(self):
-        return self.stream.isOpened()
+        return self.stream.isOpened

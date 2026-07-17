@@ -64,3 +64,4 @@ data/*.sqlite3
 models/*.pt
 models/*.onnx
 models/*.engine
+yolo11n_ncnn_model/
