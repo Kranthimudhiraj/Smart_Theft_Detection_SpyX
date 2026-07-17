@@ -14,11 +14,30 @@ let dashboardData = {
   alerts: 0,
   transactions: 0,
   status: "Online",
-  motionActive: false, // NEW: Motion detector state
+  motionActive: false, // Motion detector state
+  raspberryPiConnected: false, // New: Raspberry Pi connection tracking
+  lastHeartbeatTime: null,
+  livePersons: 0, // NEW: Real-time person count from YOLO
+  liveItems: 0,   // NEW: Real-time tracked items from YOLO
   activities: []
 };
 
 let nextActivityId = 1;
+
+function updateHeartbeat() {
+  dashboardData.raspberryPiConnected = true;
+  dashboardData.lastHeartbeatTime = new Date().toISOString();
+}
+
+// Periodically check if Raspberry Pi telemetry went silent
+setInterval(() => {
+  if (dashboardData.lastHeartbeatTime) {
+    const diffMs = new Date() - new Date(dashboardData.lastHeartbeatTime);
+    if (diffMs > 10000) { // 10 seconds timeout
+      dashboardData.raspberryPiConnected = false;
+    }
+  }
+}, 5000);
 
 function addActivity(text, category, status, customerId = "N/A") {
   const todayDate = new Date().toISOString().split("T")[0];
@@ -46,13 +65,17 @@ function addActivity(text, category, status, customerId = "N/A") {
 
 // 1. YOLO Webcam Feed (Customer tracking)
 app.post('/api/hardware/yolo', (req, res) => {
-  const { event, customerId, itemsPicked = 0 } = req.body;
+  const { event, customerId, itemsPicked = 0, personsCount = 0, itemsCount = 0 } = req.body;
+  updateHeartbeat();
   
   if (event === "customer_entered") {
     dashboardData.customers += 1;
     addActivity(`Customer entered store.`, "Security", "Verified", customerId);
   } else if (event === "item_picked") {
     addActivity(`Customer picked an item via Camera.`, "Inventory", "Flagged", customerId);
+  } else if (event === "frame_update") {
+    dashboardData.livePersons = personsCount;
+    dashboardData.liveItems = itemsCount;
   }
   
   res.status(200).json({ success: true, message: "YOLO data received" });
@@ -61,6 +84,7 @@ app.post('/api/hardware/yolo', (req, res) => {
 // 2. Load Cell (Weight sensor under rack)
 app.post('/api/hardware/loadcell', (req, res) => {
   const { weight_change_g, shelf_id } = req.body;
+  updateHeartbeat();
   
   // Assuming a negative weight change means an item was picked
   if (weight_change_g < -50) {
@@ -74,6 +98,7 @@ app.post('/api/hardware/loadcell', (req, res) => {
 // 3. Motion Detector (New!)
 app.post('/api/hardware/motion', (req, res) => {
   const { motion, zone } = req.body;
+  updateHeartbeat();
   
   // If motion state changes from false to true, log it
   if (motion && !dashboardData.motionActive) {

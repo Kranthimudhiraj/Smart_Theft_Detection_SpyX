@@ -151,6 +151,19 @@ class DataLogger:
                 })
                 print(f"[Telemetry] Sent item_picked ({', '.join(detected_items)}) for {customer_id_str}")
                 
+        # Send frame updates once every 1 second to update live counts on dashboard
+        current_time = time.time()
+        if not hasattr(self, 'last_frame_update_time'):
+            self.last_frame_update_time = 0
+            
+        if current_time - self.last_frame_update_time > 1.0:
+            self.last_frame_update_time = current_time
+            self.http_sender.send_event("/api/hardware/yolo", {
+                "event": "frame_update",
+                "personsCount": len(current_frame_customers),
+                "itemsCount": len(detected_items)
+            })
+
         self.frame_count += 1
         
         # Flush to disk periodically to avoid locking up the main loop
