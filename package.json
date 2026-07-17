@@ -1,0 +1,14 @@
+{
+  "name": "spyx-express-backend",
+  "version": "1.0.0",
+  "description": "Express backend server for SpyX Retail Guardian telemetry",
+  "type": "module",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1"
+  }
+}
