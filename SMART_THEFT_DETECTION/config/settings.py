@@ -22,5 +22,5 @@ ALLOWED_CLASSES = [
 ]
 
 # Express Server Configuration for Telemetry
-EXPRESS_SERVER_URL = "http://localhost:3001"
+EXPRESS_SERVER_URL = "https://smart-theft-detection-spyx-1.onrender.com"
 
